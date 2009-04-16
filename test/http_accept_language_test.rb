@@ -1,9 +1,13 @@
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'http_accept_language'
 require 'test/unit'
+require 'FileUtils'
+
+RAILS_ROOT = "#{File.dirname(__FILE__)}"
 
 class MockedCgiRequest
   include HttpAcceptLanguage
+
   def env
     @env ||= {'HTTP_ACCEPT_LANGUAGE' => 'en-us,en-gb;q=0.8,en;q=0.6'}
   end
@@ -38,8 +42,41 @@ class HttpAcceptLanguageTest < Test::Unit::TestCase
     assert_equal 'en', request.compatible_language_from(%w{de en})
   end
 
+  def create_locale_file files
+    name = "#{RAILS_ROOT}/lib/locale"
+    FileUtils.mkdir_p  name
+    files.each do |file|
+      File.new name + "/#{file}.yml", 'w+'
+    end
+  end
+
+  def test_should_load_avaliable_locale_from_locale_folder
+    self.create_locale_file 'en-US'
+    assert_equal "en-US", request.suggest_language
+  end
+
+  def test_should_load_avaliable_locale_from_locale_folder_when_given_locale_does_not_exist
+    self.create_locale_file 'en-US'
+    assert_equal "en-US", request.suggest_language
+  end
+
+  def test_should_load_avaliable_locale_from_locale_folder_when_given_locale_exists
+    request.env['HTTP_ACCEPT_LANGUAGE'] = 'de-de,zh-CN'
+    self.create_locale_file 'en-US'
+    self.create_locale_file 'zh-CN'
+    assert_equal "zh-CN", request.suggest_language
+
+  end
+
+
   private
+
   def request
     @request ||= MockedCgiRequest.new
   end
+
+ 
+
+
 end
+

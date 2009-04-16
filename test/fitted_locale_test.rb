@@ -1,10 +1,7 @@
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 RAILS_ROOT = "#{File.dirname(__FILE__)}"
-class I18n
-end
 
 require 'http_accept_language'
-require 'fitted_locale'
 require 'test/unit'
 require 'FileUtils'
 require  File.dirname(__FILE__) + '/../init.rb'

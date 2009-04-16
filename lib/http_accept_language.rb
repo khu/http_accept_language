@@ -50,3 +50,4 @@ module HttpAcceptLanguage
   end
 
 end
+
